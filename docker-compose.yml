@@ -33,7 +33,7 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2 #7.10.1
     volumes:
-      - ./data/elasticsearch:/usr/share/elasticsearch/data
+      - ./data/elasticsearch:/var/lib/elasticsearch/data #./data/elasticsearch:/usr/share/elasticsearch/data # Reference: https://stackoverflow.com/questions/65668188/elastic-search-accessdeniedexception-usr-share-elasticsearch-data-nodes-0-a
     environment:
       - "ES_JAVA_OPTS=-Dlog4j2.formatMsgNoLookups=true"
       - "bootstrap.memory_lock=true"
