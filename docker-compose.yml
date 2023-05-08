@@ -63,13 +63,13 @@ services:
       AMQP_VIRTUAL_HOST: analyzer
       AMQP_URL: amqp://rabbitmq:rabbitmq@rabbitmq:5672
       ES_HOSTS: http://elastic:elastic1q2w3e@elasticsearch:9200
-      # MINIO_SHORT_HOST: minio:9000
-      # MINIO_ACCESS_KEY: minio
-      # MINIO_SECRET_KEY: minio123
-      MINIO_SHORT_HOST: ${SHORT_BUCKET_HOST}
-      ANALYZER_BINARYSTORE_MINIO_REGION: ${AWS_REGION} 
-      MINIO_ACCESS_KEY: ${BUCKET_ACCESS_KEY}
-      MINIO_SECRET_KEY: ${BUCKET_SECRET_KEY}
+      MINIO_SHORT_HOST: minio:9000
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+      # MINIO_SHORT_HOST: ${SHORT_BUCKET_HOST}
+      # ANALYZER_BINARYSTORE_MINIO_REGION: ${AWS_REGION} 
+      # MINIO_ACCESS_KEY: ${BUCKET_ACCESS_KEY}
+      # MINIO_SECRET_KEY: ${BUCKET_SECRET_KEY}
     depends_on:
       elasticsearch:
         condition: service_started
@@ -86,12 +86,12 @@ services:
       AMQP_VIRTUAL_HOST: analyzer
       AMQP_URL: amqp://rabbitmq:rabbitmq@rabbitmq:5672
       ES_HOSTS: http://elastic:elastic1q2w3e@elasticsearch:9200
-      # MINIO_SHORT_HOST: minio:9000
-      # MINIO_ACCESS_KEY: minio
-      # MINIO_SECRET_KEY: minio123
-      MINIO_SHORT_HOST: ${SHORT_BUCKET_HOST}
-      MINIO_ACCESS_KEY: ${BUCKET_ACCESS_KEY}
-      MINIO_SECRET_KEY: ${BUCKET_ACCESS_KEY}
+      MINIO_SHORT_HOST: minio:9000
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+      # MINIO_SHORT_HOST: ${SHORT_BUCKET_HOST}
+      # MINIO_ACCESS_KEY: ${BUCKET_ACCESS_KEY}
+      # MINIO_SECRET_KEY: ${BUCKET_ACCESS_KEY}
       INSTANCE_TASK_TYPE: train
       UWSGI_WORKERS: 1
     depends_on:
@@ -205,25 +205,16 @@ services:
     # ports:
     #   - "9999:9999"
     environment:
-      # RP_DB_HOST: postgres
-      # RP_DB_USER: rpuser
-      # RP_DB_PASS: rppass
-      # RP_DB_NAME: reportportal
-      # RP_BINARYSTORE_TYPE: minio
-      # RP_BINARYSTORE_MINIO_ENDPOINT: http://minio:9000
-      # RP_BINARYSTORE_MINIO_ACCESSKEY: minio
-      # RP_BINARYSTORE_MINIO_SECRETKEY: minio123
-      # RP_SESSION_LIVE: 86400 #in seconds
-      - RP_DB_HOST=${DB_HOST}
-      - RP_DB_USER=${DATABASE_USER}
-      - RP_DB_PASS=${DATABASE_PASSWORD}
-      - RP_DB_NAME=${DATABASE_NAME}
-      - RP_BINARYSTORE_TYPE=minio
-      - RP_BINARYSTORE_MINIO_ENDPOINT=${BUCKET_URL}
-      - RP_BINARYSTORE_MINIO_REGION=${AWS_REGION}
-      - RP_BINARYSTORE_MINIO_ACCESSKEY=${BUCKET_ACCESS_KEY}
-      - RP_BINARYSTORE_MINIO_SECRETKEY=${BUCKET_SECRET_KEY}
-      - RP_SESSION_LIVE=86400 #in seconds
+      RP_DB_HOST: ${DB_HOST} #postgres
+      RP_DB_USER: ${DATABASE_USER} #rpuser
+      RP_DB_PASS: ${DATABASE_PASSWORD} #rppass
+      RP_DB_NAME: ${DATABASE_NAME} #reportportal
+      RP_BINARYSTORE_TYPE: minio
+      RP_BINARYSTORE_MINIO_ENDPOINT: http://minio:9000 #${BUCKET_URL}
+      # RP_BINARYSTORE_MINIO_REGION: ${AWS_REGION}
+      RP_BINARYSTORE_MINIO_ACCESSKEY: minio #${BUCKET_ACCESS_KEY}
+      RP_BINARYSTORE_MINIO_SECRETKEY: minio123 #${BUCKET_SECRET_KEY}
+      RP_SESSION_LIVE: 86400 #in seconds
     labels:
       - "traefik.http.middlewares.uat-strip-prefix.stripprefix.prefixes=/uat"
       - "traefik.http.routers.uat.middlewares=uat-strip-prefix@docker"
@@ -265,42 +256,25 @@ services:
     environment:
       ## Double entry moves test logs from PostgreSQL to Elastic-type engines
       ## Ref: https://reportportal.io/blog/double-entry-in-5.7.2
-      - RP_ELASTICSEARCHLOGMESSAGE_HOST=true
-      - RP_DB_HOST=${DB_HOST}
-      - RP_DB_USER=${DATABASE_USER}
-      - RP_DB_PASS=${DATABASE_PASSWORD}
-      - RP_DB_NAME=${DATABASE_NAME}
-      - RP_AMQP_USER=rabbitmq
-      - RP_AMQP_PASS=rabbitmq
-      - RP_AMQP_APIUSER=rabbitmq
-      - RP_AMQP_APIPASS=rabbitmq
-      - RP_BINARYSTORE_TYPE=minio
-      - RP_BINARYSTORE_MINIO_ENDPOINT=${BUCKET_URL}
-      - RP_BINARYSTORE_MINIO_REGION=${AWS_REGION}
-      - RP_BINARYSTORE_MINIO_ACCESSKEY=${BUCKET_ACCESS_KEY}
-      - RP_BINARYSTORE_MINIO_SECRETKEY=${BUCKET_SECRET_KEY}
-      - LOGGING_LEVEL_ORG_HIBERNATE_SQL=info
-      - RP_REQUESTLOGGING=false
-      - MANAGEMENT_HEALTH_ELASTICSEARCH_ENABLED=false
-      - JAVA_OPTS=-Xmx1g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp  -Dcom.sun.management.jmxremote.rmi.port=12349 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false  -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=0.0.0.0
-      # RP_ELASTICSEARCHLOGMESSAGE_HOST: "true"
-      # RP_DB_HOST: postgres
-      # RP_DB_USER: rpuser
-      # RP_DB_PASS: rppass
-      # RP_DB_NAME: reportportal
-      # RP_AMQP_USER: rabbitmq
-      # RP_AMQP_PASS: rabbitmq
-      # RP_AMQP_APIUSER: rabbitmq
-      # RP_AMQP_APIPASS: rabbitmq
-      # RP_AMQP_ANALYZER-VHOST: analyzer
-      # RP_BINARYSTORE_TYPE: minio
-      # RP_BINARYSTORE_MINIO_ENDPOINT: http://minio:9000
-      # RP_BINARYSTORE_MINIO_ACCESSKEY: minio
-      # RP_BINARYSTORE_MINIO_SECRETKEY: minio123
-      # LOGGING_LEVEL_ORG_HIBERNATE_SQL: info
-      # RP_REQUESTLOGGING: "false"
-      # MANAGEMENT_HEALTH_ELASTICSEARCH_ENABLED: "false"
-      # JAVA_OPTS: -Xmx1g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp  -Dcom.sun.management.jmxremote.rmi.port=12349 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false  -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=0.0.0.0
+      RP_ELASTICSEARCHLOGMESSAGE_HOST: "true"
+      RP_DB_HOST: ${DB_HOST} #postgres
+      RP_DB_USER: ${DATABASE_USER} #rpuser
+      RP_DB_PASS: ${DATABASE_PASSWORD} #rppass
+      RP_DB_NAME: ${DATABASE_NAME} #reportportal
+      RP_AMQP_USER: rabbitmq
+      RP_AMQP_PASS: rabbitmq
+      RP_AMQP_APIUSER: rabbitmq
+      RP_AMQP_APIPASS: rabbitmq
+      RP_AMQP_ANALYZER-VHOST: analyzer
+      RP_BINARYSTORE_TYPE: minio
+      RP_BINARYSTORE_MINIO_ENDPOINT: http://minio:9000 #${BUCKET_URL}
+      # RP_BINARYSTORE_MINIO_REGION: ${AWS_REGION}
+      RP_BINARYSTORE_MINIO_ACCESSKEY: minio #${BUCKET_ACCESS_KEY}
+      RP_BINARYSTORE_MINIO_SECRETKEY: minio123 #${BUCKET_SECRET_KEY}
+      LOGGING_LEVEL_ORG_HIBERNATE_SQL: info
+      RP_REQUESTLOGGING: "false"
+      MANAGEMENT_HEALTH_ELASTICSEARCH_ENABLED: "false"
+      JAVA_OPTS: -Xmx1g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp  -Dcom.sun.management.jmxremote.rmi.port=12349 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false  -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=0.0.0.0
     labels:
       - "traefik.http.middlewares.api-strip-prefix.stripprefix.prefixes=/api"
       - "traefik.http.routers.api.middlewares=api-strip-prefix@docker"
